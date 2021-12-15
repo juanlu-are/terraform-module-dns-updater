@@ -43,7 +43,7 @@ terraform {
     }
   }
 }
-  # MY COMMENTS:
+  # MY COMMENTS: here I've configured the specified provider as the one installed using your script with dockers.
   provider "dns" {
     update {
       server = "127.0.0.1"

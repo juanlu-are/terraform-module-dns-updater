@@ -1,7 +1,7 @@
 /**
 * # Terraform
 *
-* <Short TF module description>
+* <All exercise description has been made for each Terraform block used below in the section "MY COMMENTS">
 *
 *
 * ## Usage
@@ -31,6 +31,10 @@ terraform {
   # This module is now only being tested with Terraform 0.13.x. However, to make upgrading easier, we are setting
   # 0.12.26 as the minimum version, as that version added support for required_providers with source URLs, making it
   # forwards compatible with 0.13.x code.
+
+  # MY COMMENTS: this block contains Terraform "DNS UPDATER" settings, including the Terraform minimum version (0.13.5) and the required providers it will use to provision our infrastructure,
+  # installing them from the Terraform Registry by default. In this exercise, the DNS provider's source is defined as hashicorp/dns with also a version constraint.
+
   required_version = ">= 0.13.5"
   required_providers {
     dns = {
@@ -45,8 +49,24 @@ terraform {
 # Write your local resources here
 # ------------------------------------------
 
-locals {
+# MY COMMENTS: Terraform locals are named values that I can refer to in my configuration. It simplifies my Terraform configuration, avoiding repetition.
+# I have used Terraform's fileset function [fileset(path, pattern)] to pick up any new files (only json extension) added in the specified directory.
+# And I have also used Terraform's jsondecode function to load local variables from an external json file.
 
+locals {
+  inputs = [
+    for fn in fileset("${path.module}", "examples/exercise/input-json/*.json") :
+    jsondecode(file("${path.module}/${fn}"))
+  ]
+
+
+# MY COMMENTS: below this line you can find the local value to pickup any cname*.json files.
+
+  cname_inputs = [
+    for fn in fileset("${path.module}", "examples/exercise/input-json/cname*.json") :
+    jsondecode(file("${path.module}/${fn}"))
+  ]
+  
 }
 
 
@@ -54,13 +74,23 @@ locals {
 # Write your Terraform resources here
 # ------------------------------------------
 
+# MY COMMENTS: the resource block defines components of my infrastructure. In this case, it creates a A type DNS record set.
+# I am using here Terraform syntax with for_each and each.value to loop over the parameters of each json file parsed from locals.
+
 resource "dns_a_record_set" "www" {
+  for_each = local.inputs
   zone = "example.com."
   name = "www"
-  addresses = [
-    "192.168.0.1",
-    "192.168.0.2",
-    "192.168.0.3",
-  ]
-  ttl = 300
+  addresses = each.value.addresses
+  ttl = each.value.ttl
+}
+
+# MY COMMENTS: below this line you can find the resource to create CNAME type DNS record.
+
+resource "dns_cname_record" "foo" {
+  for_each = local.cname_inputs
+  zone  = "example.com."
+  name  = "foo"
+  cname = each.value.cname
+  ttl   = each.value.ttl
 }

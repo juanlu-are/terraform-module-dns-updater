@@ -43,13 +43,19 @@ terraform {
     }
   }
 }
-
+  # MY COMMENTS:
+  provider "dns" {
+    update {
+      server = "127.0.0.1"
+    }
+  }
 
 # ------------------------------------------
 # Write your local resources here
 # ------------------------------------------
 
-# MY COMMENTS: Terraform locals are named values that I can refer to in my configuration. It simplifies my Terraform configuration, avoiding repetition.
+# MY COMMENTS: Terraform locals are named values that I can refer to in my configuration.
+# It assigns a name to an expression, so I can use it multiple times within a module without repeating it.
 # I have used Terraform's fileset function [fileset(path, pattern)] to pick up any new files (only json extension) added in the specified directory.
 # And I have also used Terraform's jsondecode function to load local variables from an external json file.
 
@@ -79,7 +85,7 @@ locals {
 
 resource "dns_a_record_set" "www" {
   for_each = local.inputs
-  zone = "example.com."
+  zone = var.zone
   name = "www"
   addresses = each.value.addresses
   ttl = each.value.ttl
@@ -89,7 +95,7 @@ resource "dns_a_record_set" "www" {
 
 resource "dns_cname_record" "foo" {
   for_each = local.cname_inputs
-  zone  = "example.com."
+  zone  = var.zone
   name  = "foo"
   cname = each.value.cname
   ttl   = each.value.ttl

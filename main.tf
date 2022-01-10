@@ -85,7 +85,7 @@ locals {
 # I am using here Terraform syntax with for_each and each.value to loop over the parameters of each json file parsed from locals.
 
 resource "dns_a_record_set" "www" {
-  for_each = local.inputs
+  for_each = toset(local.inputs)
   zone = var.zone
   name = "www"
   addresses = each.value.addresses
@@ -95,7 +95,7 @@ resource "dns_a_record_set" "www" {
 # MY COMMENTS: below this line you can find the resource to create CNAME type DNS record.
 
 resource "dns_cname_record" "foo" {
-  for_each = local.cname_inputs
+  for_each = toset(local.cname_inputs)
   zone  = var.zone
   name  = "foo"
   cname = each.value.cname

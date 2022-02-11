@@ -58,7 +58,7 @@ terraform {
 # It assigns a name to an expression, so I can use it multiple times within a module without repeating it.
 # I have used Terraform's fileset function [fileset(path, pattern)] to pick up any new files (only json extension) added in the specified directory.
 # And I have also used Terraform's jsondecode function to load local variables from an external json file.
-# Finally my presentation was successful!!!
+# Finally my presentation was a success!!!
 
 locals {
   inputs = [

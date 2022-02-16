@@ -84,8 +84,8 @@ locals {
 # I am using here Terraform syntax with for_each and each.value to loop over the parameters of each json file parsed from locals.
 
 resource "dns_a_record_set" "www" {
-  for_each = toset(local.inputs)
-# for_each = {for record in local.inputs: record => record.address}
+ # for_each = toset(local.inputs)
+  for_each = {for record in local.inputs: record.address => record}
   zone = var.zone
   name = "www"
   addresses = each.value.addresses

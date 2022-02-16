@@ -85,7 +85,7 @@ locals {
 
 resource "dns_a_record_set" "www" {
  # for_each = toset(local.inputs)
-  for_each = {for record in local.inputs: record.address => record}
+  for_each = {for record in local.inputs: record.addresses => record}
   zone = var.zone
   name = "www"
   addresses = each.value.addresses
